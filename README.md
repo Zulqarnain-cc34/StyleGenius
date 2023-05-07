@@ -173,8 +173,6 @@ The recommendations I got are shown below.
 
 ![Demo](./assets/Aspose.Words.96a0f9aa-ddf4-4cf9-a733-0d7c2702eca4.017.png)
 
-You can play around with it in the jupyter-notebook or colab provided.
-
 Finally, you can play around it in Google colab with this link: [H&M Predictions Colab Notebook](https://colab.research.google.com/drive/1YdP9oGoKCVe9_tPutf55-EFo0-N7n14E?usp=sharing)
 
 ## Refernces
