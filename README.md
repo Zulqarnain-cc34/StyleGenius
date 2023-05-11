@@ -22,13 +22,12 @@ We will continue this approach in our solution process, take the characteristics
 
 We will make these estimations by finding which group the customer belongs to from the products purchased in the past, and by giving the most purchased products in that group. 
 
-While making these estimates, in order not to destroy the value of the customer's most recent product, we will act as a separate customer who has only purchased the last product for the first 4 products, and will use the other purchased products for the remaining 3 products. If our customer has bought only 1 product, we will act as 1 customer and bring all products from that class.
 
 ## <a name="_19hlhs5jnpd0"></a>Solution Method :
 
 1. A DF will be created including the characteristics of the users who bought each product, and classification will be made with this information.
 2. Then, each customer's information will be given to this model and its class will be found.
-3. Estimates will be made so that the first four of the products in its class are from the last purchased product, and the remaining 3 are from other purchased products.
+3. The top 7 of the products are chosen for the cluster in which the prediction lies in.
 
 # <a name="_potw7eenrv4n"></a>**Dataset Overview**
 
@@ -147,31 +146,38 @@ These results obtained for different model are
 
 All the models are performing very well. It is mainly because of our good data preprocessing and feature engineering. Our model predicts the cluster in which the product lies. There are **26 clusters** based on the characteristics of customer, product etc. Highest accuracy is given by Feed Forward Neural Network which is 0.984.
 
-Furthermore, some further preprocessing is done to account for customer details in prediction and are inserted in the dataset of 529 features to make it more than that. We make some precautions to deal with missing values, combine all and then predict with our models. The below result is from the prediction of XGBoost Classifier.
+Furthermore, some further preprocessing is done to account for customer details in prediction and are inserted in the dataset of 529 features to make it more than that. We make some precautions to deal with missing values, combine all and then predict with our models. The below result is from the prediction of LGBMClassifier.
 
 ![Results](./assets/Aspose.Words.96a0f9aa-ddf4-4cf9-a733-0d7c2702eca4.014.png)
 
 Now I will use these 7 predictions to recommend similar items.
 
-# <a name="_k55355dbny5z"></a>**Recommend Similar Products**
+# <a name="_k55355dbny5z"></a>**Product Recommendation**
+ 
 
-We use the Faiss, a library for efficient similarity search and clustering of dense vectors. It builds an index based on the vectors of the items (products) in the dataset and labels them with their respective index names. The index is then used to find similar items for a given item by calculating the L2 distance between the query vector and the indexed vectors. 
+I choose a product through the tkinter module and preprocess the data for that image to convert it into a form that is passable by the model. The product is selected from the modeling.csv. I pass this product to the model. This model predicts the cluster in which the data lies in.
 
-The search is performed in a brute-force manner using various heuristics to avoid computing distances for all vectors. The output is a dataset of items and lists similar items for each item in the dataset. 
+Lets say for a product model predicts 16th cluster.
 
-This is used to generate a set of recommended items for a specific customer by finding similar items for each of the customer's predicted items. The recommended items are then displayed as a grid of images.
+Note so the main thing that is helping are 2 things to make the model prediction:
 
-![Recommendation](./assets/Aspose.Words.96a0f9aa-ddf4-4cf9-a733-0d7c2702eca4.015.png)
+1. The trained model lgbm which has been trained on 5000 products to cluster them.
+2. Second is the dataset of predictions, after the model is trained on 5000 products.
 
-I am using the predicted classes for the next 7 days for a customer and for each item I am recommending 10 similar items using the above method.
-# <a name="_1hnd1790s2vx"></a>**Demo**
-I made a simple demo for the recommendation of items based on an image. Here is the image
+The training make the model more accurate to give the correct cluster. 
 
-![Sample](./assets/Aspose.Words.96a0f9aa-ddf4-4cf9-a733-0d7c2702eca4.016.jpeg)
+Secondly,the already predicted products that lie in different clusters are similar products. For each cluster there are 200-300 items which we can use to recommend since we have 200-300 similar products in each cluster.
 
-The recommendations I got are shown below.
+I see the cluster in which my product lies in and choose the top 7 products from that cluster. Now we have 7 recommendations.
 
-![Demo](./assets/Aspose.Words.96a0f9aa-ddf4-4cf9-a733-0d7c2702eca4.017.png)
+I combined another approach as well. It is I prepared a similarity search dataset.For each product, I have 10 similar products which i prepared using faiss similarity search. Each of the 115000 products have 10 recommendation in this one. So Now I have 70 predicted products.
+
+![Product Recommendation](./assets/Aspose.Words.96a0f9aa-ddf4-4cf9-a733-0d7c2702eca4.015.png)
+
+# <a name="_k55355dbny5z"></a>**Customer Recommendation**
+
+For Customer Recommendation, the only thing different is that i get the latest product that the customer has bought use the model ready in put data for it and then use it to make prediction. Then pass the 7 recommendation through the similarity search dataset and get 70 recommendations in total.
+
 
 Finally, you can play around it in Google colab with this link: [H&M Predictions Colab Notebook](https://colab.research.google.com/drive/1YdP9oGoKCVe9_tPutf55-EFo0-N7n14E?usp=sharing)
 
@@ -184,60 +190,3 @@ Finally, you can play around it in Google colab with this link: [H&M Predictions
 ## License
 
 This Notebook has been released under the Apache 2.0 open source license.
-
-Product Recommendation:
------------------------
-
-Here in this demo i have done away with the preprocessing pipeline and am using the data ready for model input. In actual production enviorment you will have to prepare 
-the pipeline as well.
-
-The modeling.csv has 4903 products prepared in prediction input form. So when you say i want to predict the recommendation for a product. Although I am allowing you to select an image using tkinter what is happening is that the filename of the image is also the article_id in the modeling.csv. So the preprocessed data for the image to be put as input has been put in modeling.csv.So only images that you select that have data in modeling will work which are 4903 out of 115000 something.
-
-So the product is selected from the modeling.csv. I pass this prodcut to the model lgbm which i have imported. This model predicts the cluster in which the dataset lies in. Lets say for a product model predicts 16th cluster. I have a dataset prepared by predicting the clusters for 5000 items. In each cluster there are 200-300 items. I see the cluster my product lies in a choose the top 7 products. Then i also have prepared a similarity search dataset. So for each product i have 10 similar products which i prepared using faiss similarity search. Each of the 115000 products have 10 recommendation in this one. So Now i have 70 predicted products.
-
-1. Contains the data ready for input phase
-
-        df_all_values = pd.read_csv('./modeling.csv')
-
-2. Containes the 5000 already predicted entries the format is article_id, cluster, buying_count
-
-        df_article_cluster = pd.read_csv('./articles_clusters.csv')
-
-3.  Dataset made using 10000 transactions that have customer and the products they bought
-
-        df_TRS_TR_OneCus = pd.read_csv('./Customer_Articles.csv')
-
-4. Dataset prepared that matched similar items
-
-        similar_items_df = pd.read_csv('./similar_items.csv')
-
-
-I am using tkinter to upload Image.
-
-Customer Recommendation:
------------------------
-
-Here in this demo i have done away with the preprocessing pipeline and am using the data ready for model input. In actual production enviorment you will have to prepare 
-the pipeline as well.
-
-The modeling.csv has 4903 products prepared in prediction input form. So when you say i want to predict the recommendation for a product. 
-
-The customer has to be one from the df_TRS_TR_OneCus dataset. The product data for the articles bought by this customer is taken from the modeling.csv. So the article that the person has bought its preprocessed data is selected from the modeling.csv file. For each customer even though some have 2,3 4 or even more we only look at the latest product purchased. I pass this prodcut to the model lgbm which i have imported. This model predicts the cluster in which the dataset lies in. 
-
-Lets say for a product model predicts 16th cluster. I have a dataset prepared by predicting the clusters for 5000 items. In each cluster there are 200-300 items. I see the cluster my product lies in a choose the top 7 products. Then i also have prepared a similarity search dataset. So for each product i have 10 similar products which i prepared using faiss similarity search. Each of the 115000 products have 10 recommendation in this one. So Now I have 70 predicted products.
-
-1. Contains the data ready for input phase
-
-        df_all_values = pd.read_csv('./modeling.csv')
-
-2. Containes the 5000 already predicted entries the format is article_id, cluster, buying_count
-
-        df_article_cluster = pd.read_csv('./articles_clusters.csv')
-
-3.  Dataset made using 10000 transactions that have customer and the products they bought
-
-        df_TRS_TR_OneCus = pd.read_csv('./Customer_Articles.csv')
-
-4. Dataset prepared that matched similar items
-
-        similar_items_df = pd.read_csv('./similar_items.csv')
