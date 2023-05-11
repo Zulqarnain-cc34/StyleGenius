@@ -155,9 +155,7 @@ Now I will use these 7 predictions to recommend similar items.
 # <a name="_k55355dbny5z"></a>**Product Recommendation**
  
 
-I choose a product through the tkinter module and preprocess the data for that image to convert it into a form that is passable by the model. The product is selected from the modeling.csv. I pass this product to the model. This model predicts the cluster in which the data lies in.
-
-Lets say for a product model predicts 16th cluster.
+I choose a product and preprocess the data for that image to convert it into a form that is passable by the model I pass the product to the model and it predicts the cluster in which the product lies in.
 
 Note so the main thing that is helping are 2 things to make the model prediction:
 
@@ -168,7 +166,7 @@ The training make the model more accurate to give the correct cluster.
 
 Secondly,the already predicted products that lie in different clusters are similar products. For each cluster there are 200-300 items which we can use to recommend since we have 200-300 similar products in each cluster.
 
-I see the cluster in which my product lies in and choose the top 7 products from that cluster. Now we have 7 recommendations.
+I see the cluster in which my product lies in and choose the top 7 products from that cluster.
 
 I combined another approach as well. It is I prepared a similarity search dataset.For each product, I have 10 similar products which i prepared using faiss similarity search. Each of the 115000 products have 10 recommendation in this one. So Now I have 70 predicted products.
 
